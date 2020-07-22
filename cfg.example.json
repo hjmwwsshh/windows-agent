@@ -1,7 +1,7 @@
 {
     "debug": true,
 	"logfile": "windows.log",
-    "logRotate": "0 0 0 0 */7",
+    "logRotate": "0 0 0 */7 *",
     "hostname": "",
     "ip": "",
 	"iis":{
