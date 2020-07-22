@@ -3,9 +3,14 @@ package funcs
 import (
 	"github.com/freedomkk-qfeng/windows-agent/g"
 	"github.com/open-falcon/common/model"
+	"time"
 )
 
 func DiskIOMetrics() (L []*model.MetricValue) {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
 
 	disk_iocounter, err := IOCounters()
 	if err != nil {
@@ -24,5 +29,11 @@ func DiskIOMetrics() (L []*model.MetricValue) {
 		L = append(L, CounterValue("disk.io.write_requests", ds.Write_Requests, device))
 		L = append(L, GaugeValue("disk.io.util", 100-ds.Util, device))
 	}
+
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect DiskIOMetrics complete. Process time %s.", endTime.Sub(startTime))
+	}
+
 	return
 }

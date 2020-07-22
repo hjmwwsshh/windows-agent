@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/freedomkk-qfeng/windows-agent/g"
 	"github.com/open-falcon/common/model"
@@ -17,6 +18,12 @@ func in_array_iis(a string, array []string) bool {
 }
 
 func iisMetrics() (L []*model.MetricValue) {
+	var startTime,endTime time.Time
+	var startTime2,endTime2 time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
+
 	if !g.Config().IIs.Enabled {
 		g.Logger().Println("IIs Monitor is disabled")
 		return
@@ -31,6 +38,11 @@ func iisMetrics() (L []*model.MetricValue) {
 	}
 	for _, iisStat := range IIsStat {
 		if in_array_iis(iisStat.Name, websites) {
+
+			if g.Config().Debug {
+				startTime2 = time.Now()
+			}
+
 			tag := fmt.Sprintf("site=%s", format_mertic(iisStat.Name))
 			L = append(L, CounterValue("iis.bytes.received", iisStat.BytesReceivedPersec, tag))
 			L = append(L, CounterValue("iis.bytes.sent", iisStat.BytesSentPersec, tag))
@@ -56,7 +68,18 @@ func iisMetrics() (L []*model.MetricValue) {
 			L = append(L, CounterValue("iis.requests.trace", iisStat.TraceRequestsPersec, tag))
 			L = append(L, CounterValue("iis.requests.unlock", iisStat.UnlockRequestsPersec, tag))
 			L = append(L, GaugeValue("iis.service.uptime", iisStat.ServiceUptime, tag))
+
+			if g.Config().Debug {
+				endTime2 = time.Now()
+				g.Logger().Printf("collect %s complete. Process time %s.", tag, endTime2.Sub(startTime2))
+			}
 		}
 	}
+
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect iisMetrics complete. Process time %s.", endTime.Sub(startTime))
+	}
+
 	return
 }

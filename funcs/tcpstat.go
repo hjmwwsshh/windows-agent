@@ -1,7 +1,9 @@
 package funcs
 
 import (
+	"github.com/freedomkk-qfeng/windows-agent/g"
 	"log"
+	"time"
 
 	"github.com/StackExchange/wmi"
 	"github.com/open-falcon/common/model"
@@ -24,6 +26,10 @@ type Win32_TCPPerfFormattedData struct {
 }
 
 func TcpipMetrics() (L []*model.MetricValue) {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
 
 	ds, err := TcpipCounters()
 	if err != nil {
@@ -37,10 +43,19 @@ func TcpipMetrics() (L []*model.MetricValue) {
 	L = append(L, GaugeValue("tcpip.conestablished", ds[0].ConEstablished))
 	L = append(L, CounterValue("tcpip.conreset", ds[0].ConReset))
 
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect TcpipMetrics complete. Process time %s.", endTime.Sub(startTime))
+	}
 	return
 }
 
 func TcpipCounters() ([]Tcpipdatastat, error) {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
+
 	ret := make([]Tcpipdatastat, 0)
 	var dst []Win32_TCPPerfFormattedData
 	err := wmi.Query("SELECT ConnectionFailures,ConnectionsActive,ConnectionsPassive,ConnectionsEstablished,ConnectionsReset FROM Win32_PerfRawData_Tcpip_TCPv4", &dst)
@@ -57,6 +72,11 @@ func TcpipCounters() ([]Tcpipdatastat, error) {
 			ConEstablished: uint64(d.ConnectionsEstablished),
 			ConReset:       uint64(d.ConnectionsReset),
 		})
+	}
+
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect TcpipCounters complete. Process time %s.", endTime.Sub(startTime))
 	}
 
 	return ret, nil

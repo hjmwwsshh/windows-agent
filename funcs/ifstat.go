@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"strings"
+	"time"
 
 	"github.com/freedomkk-qfeng/windows-agent/g"
 	"github.com/open-falcon/common/model"
@@ -26,6 +27,10 @@ func NetMetrics() []*model.MetricValue {
 }
 
 func CoreNetMetrics(ifacePrefix []string) (L []*model.MetricValue) {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
 
 	netIfs, err := net_status(ifacePrefix)
 	if err != nil {
@@ -45,6 +50,10 @@ func CoreNetMetrics(ifacePrefix []string) (L []*model.MetricValue) {
 		L = append(L, CounterValue("net.if.out.errors", netIf.Errout, iface))
 		L = append(L, CounterValue("net.if.out.dropped", netIf.Dropout, iface))
 		L = append(L, CounterValue("net.if.out.fifo.errs", netIf.Fifoout, iface))
+	}
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect NetMetrics complete. Process time %s.", endTime.Sub(startTime))
 	}
 	return
 }

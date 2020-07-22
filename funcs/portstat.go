@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"time"
 
 	"github.com/freedomkk-qfeng/windows-agent/g"
 	"github.com/open-falcon/common/model"
@@ -63,6 +64,11 @@ func CheckTCPPortUsed(port int64) bool {
 }
 
 func PortMetrics() (L []*model.MetricValue) {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
+
 	reportPorts := g.ReportPorts()
 	sz := len(reportPorts)
 	if sz == 0 {
@@ -78,5 +84,9 @@ func PortMetrics() (L []*model.MetricValue) {
 		}
 	}
 
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect PortMetrics complete. Process time %s.", endTime.Sub(startTime))
+	}
 	return
 }

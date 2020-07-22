@@ -1,6 +1,7 @@
 {
     "debug": true,
 	"logfile": "windows.log",
+    "logRotate": "0 0 0 0 */7",
     "hostname": "",
     "ip": "",
 	"iis":{
@@ -31,7 +32,7 @@
         "addrs": [
             "127.0.0.1:8433"
         ],
-        "interval": 60,
+        "interval": 30,
         "timeout": 1000
     },
     "http": {

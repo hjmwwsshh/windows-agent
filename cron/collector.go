@@ -34,7 +34,7 @@ func collect(sec int64, fns []func() []*model.MetricValue) {
 	t := time.NewTicker(time.Second * time.Duration(sec)).C
 	for {
 		<-t
-
+		startTime := time.Now()
 		hostname, err := g.Hostname()
 		if err != nil {
 			continue
@@ -68,7 +68,8 @@ func collect(sec int64, fns []func() []*model.MetricValue) {
 			mvs[j].Endpoint = hostname
 			mvs[j].Timestamp = now
 		}
-
+		endTime := time.Now()
+		g.Logger().Printf("collect complete. Process time %s.", endTime.Sub(startTime))
 		g.SendToTransfer(mvs)
 
 	}

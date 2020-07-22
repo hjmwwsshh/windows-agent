@@ -55,6 +55,7 @@ type GlobalConfig struct {
 	IIs           *IIsConfig        `json:"iis"`
 	MsSQL         *MsSQLConfig      `json:"mssql"`
 	Logfile       string            `json:"logfile"`
+	LogRotate     string			`json:"logRotate"`
 	Heartbeat     *HeartbeatConfig  `json:"heartbeat"`
 	Transfer      *TransferConfig   `json:"transfer"`
 	Http          *HttpConfig       `json:"http"`

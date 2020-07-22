@@ -1,7 +1,9 @@
 package funcs
 
 import (
+	"github.com/freedomkk-qfeng/windows-agent/g"
 	"sync"
+	"time"
 
 	"github.com/open-falcon/common/model"
 )
@@ -79,6 +81,10 @@ func CpuPrepared() bool {
 }
 
 func CpuMetrics() []*model.MetricValue {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
 	if !CpuPrepared() {
 		return []*model.MetricValue{}
 	}
@@ -88,6 +94,11 @@ func CpuMetrics() []*model.MetricValue {
 	busy := GaugeValue("cpu.busy", 100.0-cpuIdleVal)
 	user := GaugeValue("cpu.user", CpuUser())
 	system := GaugeValue("cpu.system", CpuSystem())
+
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect CpuMetrics complete. Process time %s.", endTime.Sub(startTime))
+	}
 
 	return []*model.MetricValue{idle, user, busy, system}
 }

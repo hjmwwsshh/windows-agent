@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/freedomkk-qfeng/windows-agent/g"
@@ -19,6 +20,11 @@ type mssql struct {
 }
 
 func mssqlMetrics() (L []*model.MetricValue) {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
+
 	if !g.Config().MsSQL.Enabled {
 		g.Logger().Println("MsSQL Monitor is disabled")
 		return
@@ -70,6 +76,12 @@ func mssqlMetrics() (L []*model.MetricValue) {
 	} else {
 		g.Logger().Println(err)
 	}
+
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect mssqlMetrics complete. Process time %s.", endTime.Sub(startTime))
+	}
+
 	return
 }
 

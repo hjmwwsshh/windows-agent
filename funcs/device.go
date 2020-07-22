@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/freedomkk-qfeng/windows-agent/g"
 
@@ -19,6 +20,11 @@ func disk_Partitions() ([]disk.PartitionStat, error) {
 	return disk_Partitions, err
 }
 func DeviceMetrics() (L []*model.MetricValue) {
+	var startTime,endTime time.Time
+	if g.Config().Debug {
+		startTime = time.Now()
+	}
+
 	diskPartitions, err := disk_Partitions()
 
 	if err != nil {
@@ -51,6 +57,11 @@ func DeviceMetrics() (L []*model.MetricValue) {
 		L = append(L, GaugeValue("df.statistics.total", float64(diskTotal)))
 		L = append(L, GaugeValue("df.statistics.used", float64(diskUsed)))
 		L = append(L, GaugeValue("df.statistics.used.percent", float64(diskUsed)*100.0/float64(diskTotal)))
+	}
+
+	if g.Config().Debug {
+		endTime = time.Now()
+		g.Logger().Printf("collect DeviceMetrics complete. Process time %s.", endTime.Sub(startTime))
 	}
 
 	return
